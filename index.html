@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Recipe Organizer</title>
+</head>
+<body>
+<div class="menu" id="main">
+<h1>Recipe Organizer</h1>
+<p class="button" onclick="searchRecipes(); show('search','main')">Search Recipies</p><br>
+<p class="button" onclick="show('addrecipe','main');">Add Recipe</p><br>
+</div>
+<div class="menu" id="search" style="display: none;">
+<h1>Search</h1>
+<input onkeyup="searchRecipes(this.value)" placholder="Search..">
+<div id="search2">
+</div>
+</div>
+<div class="menu" id="recipe" style="display: none;">
+<h1 id="rname">Recipe Name</h1>
+<p class="button"  style="padding: 0px;" id="delete">Delete</p>
+<i id="ttm">Time To Make</i><br>
+<i id="cate">Category</i><br>
+<p id="ingred">Ingrediants</p><br>
+<p id="instruc">Instructions</p>
+<p class="button" onclick="show('main', 'recipe')">Back To Menu</p>
+</div>
+<div class="menu" id="addrecipe" style="display: none;">
+<h1>Add Recipe</h1>
+<input placeholder="Recipe Name.." id="rename"><br>
+<textarea placeholder="Ingredients.." id="reingred" value=""></textarea><br>
+<textarea placeholder="Instructions.." id="reinstruc" value=""></textarea><br>
+<input placeholder="Time To Make (minutes).." id="rettm"><br>
+<input placeholder="Category.." id="recate">
+<p onclick="addRecipe();" class="button">Add</p><br>
+<p class="button" onclick="show('main', 'addrecipe')">Back To Menu</p>
+</div>
+</body>
+<script>
+var $ = function(id) {
+  return document.getElementById(id);
+}
+function show(show,hide) {
+  $(show).style.display = "block";
+  $(hide).style.display = "none";
+}
+var storage = window.localStorage;
+var recipes = storage.getItem("recipes");
+recipes = JSON.parse(recipes);
+if (!recipes) {
+  recipes = {};
+}
+function addRecipe() {
+  var rname = $("rename").value;
+  var ingreds = $("reingred").value;
+  var instruc = $("reinstruc").value;
+  var ttm = $("rettm").value;
+  var cate = $("recate").value;
+  $("rename").value = "";
+  $("reingred").value = "";
+  $("reinstruc").value = "";
+  $("rettm").value = "";
+  $("recate").value = "";
+  var element_count = 0;
+for (e in recipes) {  if (recipes.hasOwnProperty(e)) element_count++; }
+  element_count = element_count.toString();
+  recipes[element_count] = {
+    name: rname,
+    ingrediants: ingreds,
+    instructions: instruc,
+    timetomake: ttm,
+    category: cate
+  }
+  /*recipes[element_count].name = name;
+  recipes[element_count].ingrediants = ingreds;
+  recipes[element_count].instructions = instruc;
+  recipes[element_count].timetomake = ttm;*/
+  storage.setItem("recipes", JSON.stringify(recipes));
+}
+function deleteRecipe(id) {
+  var val = Math.floor(1000 + Math.random() * 9000);
+  val = val.toString();
+  var sure = prompt("Type '"+val+"' if you are sure about deleting this recipe");
+  if (sure != val) {
+  } else {
+    recipes[id] = undefined;
+    storage.setItem("recipes", JSON.stringify(recipes));
+  }
+}
+function searchRecipes(name) {
+  document.getElementById("search2").innerHTML = '';
+  for (var i in recipes) {
+    //console.log(recipes[i].name);
+    if (recipes[i].name.includes(name)) {
+      var p = document.createElement("p");
+      p.innerHTML = "<b>Name: </b>"+recipes[i].name+"<b><br>Time To Make: </b>"+recipes[i].timetomake+" Minutes<br><b>Category: </b>"+recipes[i].category;
+      p.id = "sitem";
+      p.onclick = function() {showRecipe(i); show('recipe','search')};
+      document.getElementById("search2").appendChild(p);
+    }
+  }
+}
+function showRecipe(id) {
+  $("rname").innerHTML = recipes[id].name;
+  $("delete").onclick = function() {deleteRecipe(id);};
+  $("ttm").innerHTML = "<b>Time To Make: </b>"+recipes[id].timetomake+" Minutes";
+  $("cate").innerHTML = "<b>Category: </b>"+recipes[id].category;
+  $("ingred").innerHTML = "<h3><b>--Ingredients-- </b></h3><br>"+recipes[id].ingrediants;
+  $("instruc").innerHTML = "<h3><b>--Intructions-- </b></h3><br>"+recipes[id].instructions;
+}
+searchRecipes()
+//addRecipe("Cookies", "Flour<br>Eggs<br>Milk", "Mix Eggs and Milk then wait 5 minutes. Then, add milk and mix throughly. Shape into balls and cook in oven for 20 minutes.", "25", "Dessert");
+$("")
+</script>
+<style>
+body {
+  font-family: "Sans";
+  user-select: none;
+}
+.menu {
+  background-color: #a491ff;
+  border: solid black;
+  border-radius: 9px;
+  text-align: center;
+  padding: 15px;
+}
+.menu input {
+   border-radius: 9px;
+   font-size: 25px;
+}
+.menu textarea {
+   border-radius: 9px;
+   font-size: 25px;
+   height: 300px;
+   width: 80%;
+}
+.button {
+  background-color: #93ede6;
+  width: 50%;
+  margin: auto;
+  padding: 20px;
+  border: solid #6d6d6e;
+  border-radius: 9px;
+}
+.button:hover {
+  background-color: #80d1cb;
+  padding: 18px;
+}
+.button:active {
+  background-color: #72bab5;
+  padding: 15px;
+}
+#sitem {
+  background-color: #93ede6;
+  width: 80%;
+  border: solid #6d6d6e;
+  border-radius: 9px;
+  padding: 10px;
+  margin: auto;
+}
+#sitem:hover {
+  background-color: #80d1cb;
+  padding: 8px;
+}
+#sitem:active {
+  background-color: #72bab5;
+  padding: 5px;
+}
+</style>
+</html>
